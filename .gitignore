@@ -1,0 +1,8 @@
+build/
+build_clang/
+build_gcc/
+doc/
+*.o
+/.idea/
+/cmake-build-*/
+
