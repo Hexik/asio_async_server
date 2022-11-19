@@ -96,22 +96,16 @@ std::string getMEM()
                 if( name == "MemTotal:" ) {
                     result += value;
                     ++counter;
-                } else if( name == "MemFree:" ) {
-                    result -= value;
-                    ++counter;
-                } else if( name == "Cached:" ) {
-                    result -= value;
-                    ++counter;
-                } else if( name == "Buffers:" ) {
+                } else if( name == "MemFree:" || name == "Cached:" || name == "Buffers:" ) {
                     result -= value;
                     ++counter;
                 }
             } else {
-                std::cerr << "/proc/meminfo" << "has wrong format: " << line << std::endl;
+                std::cerr << "/proc/meminfo has wrong format: " << line << std::endl;
                 return "NaN";
             }
         }
-        return ( counter == 4U ) ? std::to_string( result ) : "0";
+        return ( ( counter == 4U ) ? std::to_string( result ) : "0" ) + " KB";
     } else {
         return "NaN";
     }
