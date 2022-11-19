@@ -2,6 +2,7 @@
 #include <memory>
 #include <utility>
 #include <boost/asio.hpp>
+#include "server/PeriodicTask.h"
 
 class AsyncServer
 {
@@ -14,4 +15,5 @@ private:
     void        async_accept_one();
 
     boost::asio::ip::tcp::acceptor m_acceptor;
+    PeriodicTask                   task;
 };

@@ -7,7 +7,7 @@
 #include "constants.h"
 
 AsyncServer::AsyncServer( boost::asio::io_context& context, uint16_t port ) :
-    m_acceptor { context, { boost::asio::ip::tcp::v4(), port } }
+    m_acceptor { context, { boost::asio::ip::tcp::v4(), port } }, task( context )
 {
     async_accept_one();
 }
