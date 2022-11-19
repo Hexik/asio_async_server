@@ -6,6 +6,7 @@
 AsyncServer::AsyncServer( boost::asio::io_context& context, uint16_t port ) :
     m_acceptor { context, { boost::asio::ip::tcp::v4(), port } }, task( context )
 {
+    NOT_USED_VAR( getCPU() ); // dirty hack: call this function to initialize prevXXX variables for the first time
     async_accept_one();
 }
 
