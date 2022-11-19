@@ -30,6 +30,7 @@ int main( int argc, char** argv )
                 const char* data = boost::asio::buffer_cast<const char*>( receive_buffer.data() );
                 std::cout << data;
             }
+            std::this_thread::sleep_for( std::chrono::milliseconds( 100 ) );
         }
     } catch( std::exception& e ) {
         std::cerr << "Exception: " << e.what() << std::endl;
