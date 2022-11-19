@@ -5,7 +5,7 @@
 #include <fstream>
 #include <sstream>
 #include <iostream>
-#include "utilities.h"
+#include <iomanip>
 
 std::string Trim( const std::string& str )
 {
@@ -32,7 +32,54 @@ std::string getResponse( const std::string& cmd )
     return "NA";
 }
 
-std::string getCPU() { return std::string( "13" ); }
+std::string getCPU()
+{
+    std::ifstream ifs( "/proc/stat" );
+
+    static int64_t prevTotal = 0;
+    static int64_t prevIdle  = 0;
+
+    if( ifs ) {
+        std::string line;
+
+        while( std::getline( ifs, line ) ) {
+            std::istringstream iss( line );
+            std::string        name;
+            int64_t            user, nice, system, idle, iowait, irq, softirq, steal, guest, guest_nice;
+
+            if( iss >> name >> user >> nice >> system >> idle >> iowait >> irq >> softirq >> steal >> guest >>
+                guest_nice ) {
+                if( name == "cpu" ) {
+                    // Calculation recipe from
+                    // https://stackoverflow.com/questions/23367857/accurate-calculation-of-cpu-usage-given-in-percentage-in-linux/
+                    const auto sumIdle  = idle + iowait;
+                    const auto NonIdle  = user + nice + system + irq + softirq + steal;
+                    const auto sumTotal = sumIdle + NonIdle;
+
+                    //differentiate : actual value minus the previous one
+                    const auto totald = sumTotal - prevTotal;
+                    const auto idled  = sumIdle - prevIdle;
+
+                    const auto CPU_Percentage = ( totald == 0 ) ? 100.0f
+                                                                : 100.0f * ( static_cast<float>( totald - idled ) ) /
+                                                                      static_cast<float>( totald );
+
+                    prevTotal = sumTotal;
+                    prevIdle  = sumIdle;
+                    std::stringstream ss;
+                    ss << std::fixed << std::setprecision( 2 ) << CPU_Percentage << " %";
+                    return ss.str();
+                }
+            } else {
+                std::cerr << "/proc/stat has wrong format: " << line << std::endl;
+                return "NaN";
+            }
+        }
+        return "NaN";
+    } else {
+        return "NaN";
+    }
+}
 
 std::string getMEM()
 {
