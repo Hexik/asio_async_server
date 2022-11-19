@@ -4,6 +4,7 @@
  */
 
 #include <sys/syslog.h>
+#include <iostream>
 #include "main.h"
 #include "server/AsyncServer.h"
 

@@ -1,10 +1,7 @@
-//
-// Created by mf on 17.11.22.
-//
-
 #include "AsyncServer.h"
 #include "utilities.h"
 #include "constants.h"
+#include <iostream>
 
 AsyncServer::AsyncServer( boost::asio::io_context& context, uint16_t port ) :
     m_acceptor { context, { boost::asio::ip::tcp::v4(), port } }, task( context )

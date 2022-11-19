@@ -1,6 +1,5 @@
 #include <iostream>
 #include <boost/asio.hpp>
-#include <thread>
 #include "constants.h"
 
 int main( int argc, char** argv )

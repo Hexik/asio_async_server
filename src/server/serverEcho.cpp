@@ -1,4 +1,5 @@
 #include "server/AsyncServer.h"
+#include <iostream>
 
 int main()
 {
