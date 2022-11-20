@@ -3,8 +3,8 @@
 #include "constants.h"
 #include <iostream>
 
-AsyncServer::AsyncServer( boost::asio::io_context& context, uint16_t port ) :
-    m_acceptor { context, { boost::asio::ip::tcp::v4(), port } }, task( context )
+AsyncServer::AsyncServer( boost::asio::io_context& context, uint16_t port, bool verbose ) :
+    m_acceptor { context, { boost::asio::ip::tcp::v4(), port } }, task( context ), m_verbose( verbose )
 {
     NOT_USED_VAR( getCPU() ); // dirty hack: call this function to initialize prevXXX variables for the first time
     async_accept_one();

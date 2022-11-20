@@ -10,6 +10,42 @@
 
 constexpr uint16_t SERVER_PORT = 5001U; /**< Fixed server port */
 
+#ifdef DEBUG
+constexpr bool VERBOSITY = true;
+#else
+constexpr bool VERBOSITY = false;
+#endif
+
+/**@{
+ * @brief Design by contract macros
+ * @param cond assert condition
+ */
+#ifdef DEBUG
+#    define EXPECTS( cond )                                       \
+        do {                                                      \
+            if( !( cond ) ) {                                     \
+                std::cerr << "Expects: %s" << #cond << std::endl; \
+                assert( cond );                                   \
+            }                                                     \
+        } while( false )
+#    define ENSURES( cond )                                       \
+        do {                                                      \
+            if( !( cond ) ) {                                     \
+                std::cerr << "Expects: %s" << #cond << std::endl; \
+                assert( cond );                                   \
+            }                                                     \
+        } while( false )
+#else
+#    define EXPECTS( cond )       \
+        do {                      \
+            NOT_USED_VAR( cond ); \
+        } while( false )
+#    define ENSURES( cond )       \
+        do {                      \
+            NOT_USED_VAR( cond ); \
+        } while( false )
+#endif
+
 /**@{
  * @brief Suppress not used var warning
  * @param v value to void
