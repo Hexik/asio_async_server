@@ -62,7 +62,7 @@ message("   Version  : ${GIT_TXT}")
 #-----------------------------------------------------------
 # Find packages - Boost
 #-----------------------------------------------------------
-find_package(Boost REQUIRED COMPONENTS system thread chrono)
+find_package(Boost REQUIRED COMPONENTS system )
 message("   Boost    : ${Boost_VERSION_STRING}")
 
 ############################################################
