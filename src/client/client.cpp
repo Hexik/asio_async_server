@@ -22,19 +22,31 @@ int main( int argc, char** argv )
             }
             // getting response from server
             boost::asio::streambuf receive_buffer;
-            boost::asio::read( socket, receive_buffer, boost::asio::transfer_at_least( 1 ), error );
-            if( error && error != boost::asio::error::eof ) {
-                std::cerr << "receive failed: " << error.message() << std::endl;
-            } else {
-                const char* data = boost::asio::buffer_cast<const char*>( receive_buffer.data() );
-                std::cout << data;
-            }
-            std::this_thread::sleep_for( std::chrono::milliseconds( 100 ) );
+
+            // read from socket one line
+            boost::asio::async_read_until(
+                socket, receive_buffer, "\n", [&]( const boost::system::error_code& ec, std::size_t length ) {
+                    if( !ec ) {
+                        EXPECTS( receive_buffer.size() >= length );
+
+                        const char* data = boost::asio::buffer_cast<const char*>( receive_buffer.data() );
+                        std::cout << data;
+
+                    } else if( ec == boost::asio::error::eof ) {
+                        std::cerr << "Session done " << std::endl;
+                    } else {
+                        std::cerr << "Session Error " << std::endl;
+                    }
+                } );
+
+            io_service.run_one();
+            io_service.reset();
+            std::this_thread::sleep_for( std::chrono::milliseconds( 200 ) );
         }
     } catch( std::exception& e ) {
         std::cerr << "Exception: " << e.what() << std::endl;
     }
 
-    std::this_thread::sleep_for( std::chrono::milliseconds( 50 ) );
+    std::this_thread::sleep_for( std::chrono::milliseconds( 500 ) );
     return 0;
 }

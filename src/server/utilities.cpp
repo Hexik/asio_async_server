@@ -18,17 +18,6 @@ std::string Trim( const std::string& str )
     return tmp;
 }
 
-std::string getResponse( const std::string& cmd )
-{
-    if( cmd == "cpu" ) {
-        return getCPU();
-    }
-    if( cmd == "mem" ) {
-        return getMEM();
-    }
-    return "NA";
-}
-
 std::string getCPU()
 {
     std::ifstream ifs( "/proc/stat" );

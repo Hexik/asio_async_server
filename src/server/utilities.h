@@ -6,8 +6,6 @@
 
 std::string Trim( const std::string& str ) attr_wur;
 
-std::string getResponse( const std::string& cmd ) attr_wur;
-
 std::string getCPU() attr_wur;
 std::string getMEM() attr_wur;
 
