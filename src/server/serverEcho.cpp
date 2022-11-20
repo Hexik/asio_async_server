@@ -9,7 +9,7 @@ int main()
         boost::asio::signal_set signals( context, SIGINT, SIGTERM );
         signals.async_wait( [&]( boost::system::error_code /*ec*/, int /*signo*/ ) { context.stop(); } );
 
-        AsyncServer listen( context, 5001, VERBOSITY );
+        AsyncServer listen( context, 5001, true );
 
         context.run();
         std::cerr << "Server done \n";
