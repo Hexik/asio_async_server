@@ -1,10 +1,8 @@
 #include "PeriodicTask.h"
 
-PeriodicTask::PeriodicTask( boost::asio::io_context& context ) :
-    m_interval( 0 ), m_callback( std::move( nullptr ) ), m_timer( context )
-{ }
+PeriodicTask::PeriodicTask( boost::asio::io_context& context ) : m_interval( 0 ), m_timer( context ) { }
 
-void PeriodicTask::start( Clock::duration interval, Callback cb )
+void PeriodicTask::start( Duration interval, Callback cb )
 {
     m_interval = interval;
     m_callback = std::move( cb );

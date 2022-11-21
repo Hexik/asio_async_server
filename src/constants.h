@@ -1,6 +1,6 @@
 /**
 * @file constants.h
-* @brief Declarations of system wide constants
+* @brief Declarations of system wide constants and macros
 */
 
 #ifndef REMOTE_TOP_CONSTANTS_H
@@ -10,6 +10,9 @@
 
 constexpr uint16_t SERVER_PORT = 5001U; /**< Fixed server port */
 
+/**
+ * @brief program verbosity
+ */
 #ifdef DEBUG
 constexpr bool VERBOSITY = true;
 #else

@@ -2,13 +2,17 @@
 #include "utilities.h"
 
 AsyncServer::AsyncServer( boost::asio::io_context& context, uint16_t port, bool verbose ) :
-    m_acceptor { context, { boost::asio::ip::tcp::v4(), port } }, task( context ), m_verbose( verbose )
+    m_acceptor { context, { boost::asio::ip::tcp::v4(), port } }, m_task( context ), m_verbose( verbose )
 {
-    NOT_USED_VAR( getCPU() ); // dirty hack: call this function to initialize prevXXX variables for the first time
-    task.start( std::chrono::milliseconds( 500 ), [this]() {
+    m_CPU = getCPU(); // dirty hack: call this function to initialize prevXXX variables for the first time
+
+    // start periodical CPU calculation
+    m_task.start( std::chrono::milliseconds( 500 ), [this]() {
         auto lock = std::unique_lock<std::mutex>( m_mutex );
-        m_CPU = getCPU();
+        m_CPU     = getCPU();
     } );
+
+    // ready for client(s)
     async_accept_one();
 }
 
@@ -28,18 +32,24 @@ void AsyncServer::session( boost::asio::ip::tcp::socket socket )
 
 std::string AsyncServer::getResponse( const std::string& cmd )
 {
+    // response is calculated by periodical task, so inside task.period is response the same
     if( cmd == "cpu" ) {
         auto lock = std::unique_lock<std::mutex>( m_mutex );
         return m_CPU;
     }
+
+    // response is calculated for every request
     if( cmd == "mem" ) {
         return getMEM();
     }
+
+    // unknown request
     return "NA";
 }
 
 void AsyncServer::async_accept_one()
 {
+    // setup accept callback, simultaneous clients supported
     m_acceptor.async_accept( [this]( boost::system::error_code ec, boost::asio::ip::tcp::socket socket ) {
         if( !ec ) {
             session( std::move( socket ) );
@@ -53,6 +63,7 @@ void AsyncServer::async_accept_one()
 
 void AsyncServer::do_read( const std::shared_ptr<session_state>& state )
 {
+    // async callback after \n detection in input stream from socket
     boost::asio::async_read_until( state->m_socket, state->m_streambuf, "\n",
                                    [state, this]( const boost::system::error_code& ec, std::size_t length ) {
                                        if( !ec ) {
@@ -71,20 +82,25 @@ void AsyncServer::do_read( const std::shared_ptr<session_state>& state )
 
 void AsyncServer::do_write( const std::shared_ptr<session_state>& state, std::size_t length )
 {
-    auto command =
+    // extract command without \n
+    const auto command =
         Trim( std::string( boost::asio::buffer_cast<const char*>( state->m_streambuf.data() ), length - 1 ) );
+
     if( m_verbose ) {
         std::cerr << "Session read " << command << std::endl;
     }
 
-    command += "=" + getResponse( command ) + "\n";
+    // prepare response
+    const auto response = command + "=" + getResponse( command ) + "\n";
     if( m_verbose ) {
-        std::cerr << "Session write " << command;
+        std::cerr << "Session write " << response;
     }
 
+    // remove used data from input stream
     state->m_streambuf.consume( length );
 
-    boost::asio::async_write( state->m_socket, boost::asio::buffer( command ),
+    // send response and start new read
+    boost::asio::async_write( state->m_socket, boost::asio::buffer( response ),
                               [state, this]( boost::system::error_code ec, std::size_t /*length*/ ) {
                                   if( !ec ) {
                                       do_read( state );

@@ -30,12 +30,12 @@ std::string getCPU()
 
         while( std::getline( ifs, line ) ) {
             std::istringstream iss( line );
-            std::string        name;
+            std::string        item;
             int64_t            user, nice, system, idle, iowait, irq, softirq, steal, guest, guest_nice;
 
-            if( iss >> name >> user >> nice >> system >> idle >> iowait >> irq >> softirq >> steal >> guest >>
+            if( iss >> item >> user >> nice >> system >> idle >> iowait >> irq >> softirq >> steal >> guest >>
                 guest_nice ) {
-                if( name == "cpu" ) {
+                if( item == "cpu" ) {
                     // Calculation recipe from
                     // https://stackoverflow.com/questions/23367857/accurate-calculation-of-cpu-usage-given-in-percentage-in-linux/
                     const auto sumIdle  = idle + iowait;
@@ -61,10 +61,9 @@ std::string getCPU()
                 return "NaN";
             }
         }
-        return "NaN";
-    } else {
-        return "NaN";
     }
+    return "NaN";
+
 }
 
 std::string getMEM()
@@ -78,14 +77,14 @@ std::string getMEM()
 
         while( std::getline( ifs, line ) && counter < 4U ) {
             std::istringstream iss( line );
-            std::string        name;
+            std::string        item;
             int64_t            value;
 
-            if( iss >> name >> value ) {
-                if( name == "MemTotal:" ) {
+            if( iss >> item >> value ) {
+                if( item == "MemTotal:" ) {
                     result += value;
                     ++counter;
-                } else if( name == "MemFree:" || name == "Cached:" || name == "Buffers:" ) {
+                } else if( item == "MemFree:" || item == "Cached:" || item == "Buffers:" ) {
                     result -= value;
                     ++counter;
                 }
@@ -94,6 +93,7 @@ std::string getMEM()
                 return "NaN";
             }
         }
+        // if all 4 items found, result is returned else 0
         return ( ( counter == 4U ) ? std::to_string( result ) : "0" ) + " KB";
     } else {
         return "NaN";
