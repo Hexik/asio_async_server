@@ -1,9 +1,24 @@
-#include <iostream>
+/**
+* @file client.cpp
+* @brief Simple TCP client
+*/
+
 #include <boost/asio.hpp>
 #include "constants.h"
 
+/**
+ * @brief Client - Starting point
+ * @param argc arg count
+ * @param argv arguments
+ * @return status
+ */
 int main( int argc, char** argv )
 {
+    if( argc < 2 ) {
+        std::cerr << "Usage: client IP_ADDRESS [mem|cpu]" << std::endl;
+        return 0;
+    }
+
     try {
         boost::asio::io_service io_service;
         //socket creation
@@ -15,15 +30,16 @@ int main( int argc, char** argv )
         // request/message from client
         boost::system::error_code error;
         for( int i = 2; i < argc; ++i ) {
-            auto s = std::string( argv[i] ) + "\n";
+            const auto s = std::string( argv[i] ) + "\n";
             boost::asio::write( socket, boost::asio::buffer( s ), error );
             if( error ) {
                 std::cerr << "send failed: " << error.message() << std::endl;
             }
+
             // getting response from server
             boost::asio::streambuf receive_buffer;
 
-            // read from socket one line
+            // read one line from socket
             boost::asio::async_read_until(
                 socket, receive_buffer, "\n", [&]( const boost::system::error_code& ec, std::size_t length ) {
                     if( !ec ) {
@@ -41,12 +57,13 @@ int main( int argc, char** argv )
 
             io_service.run_one();
             io_service.reset();
+
+            // short delay between requests, should be commented out
             std::this_thread::sleep_for( std::chrono::milliseconds( 200 ) );
         }
     } catch( std::exception& e ) {
         std::cerr << "Exception: " << e.what() << std::endl;
     }
 
-    std::this_thread::sleep_for( std::chrono::milliseconds( 500 ) );
     return 0;
 }

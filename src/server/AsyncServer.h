@@ -1,7 +1,11 @@
+/**
+* @file AsyncServer.h
+* @brief Declaration of class encapsulating TCP server functionality
+*/
+
 #include <boost/asio.hpp>
 #include "server/PeriodicTask.h"
 #include "utilities.h"
-#include <iostream>
 #include <mutex>
 
 /**
@@ -30,20 +34,20 @@ private:
 
         /**
          * @brief Constructor
-         * @param s boost TCP socket
+         * @param socket boost TCP socket
          */
-        explicit session_state( boost::asio::ip::tcp::socket s ) : m_socket( std::move( s ) ) { }
+        explicit session_state( boost::asio::ip::tcp::socket socket ) : m_socket( std::move( socket ) ) { }
     };
 
     /**
      * @brief Read from client
-     * @param state status
+     * @param state connection data
      */
     void do_read( const std::shared_ptr<session_state>& state );
 
     /**
      * @brief Write response to the client
-     * @param state status
+     * @param state connection data
      * @param length data size
      */
     void do_write( const std::shared_ptr<session_state>& state, std::size_t length );
@@ -68,10 +72,10 @@ private:
 
     /**
      * @brief Returns response to command/request
-     * @param cmd request
+     * @param req request
      * @return response to the request, "NA" if wrong request
      */
-    std::string getResponse( const std::string& cmd ) attr_wur;
+    std::string getResponse( const std::string& req ) attr_wur;
 
     boost::asio::ip::tcp::acceptor m_acceptor; /**< accepts incoming TCP connections */
     PeriodicTask                   m_task;     /**< periodic task */

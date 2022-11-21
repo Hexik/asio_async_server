@@ -1,3 +1,8 @@
+/**
+* @file utilities.h
+* @brief Helper functions, /proc parsing
+*/
+
 #ifndef REMOTE_TOP_UTILITIES_H
 #define REMOTE_TOP_UTILITIES_H
 
@@ -13,13 +18,13 @@ std::string Trim( const std::string& str ) attr_wur;
 
 /**
  * @brief Response to the 'cpu' command
- * @return formatted string
+ * @return formatted string, cpu=dd.dd %
  */
 std::string getCPU() attr_wur;
 
 /**
 * @brief Response to the 'mem' command
-* @return formatted string
+* @return formatted string, mem=N KB
  */
 std::string getMEM() attr_wur;
 

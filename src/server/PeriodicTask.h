@@ -1,14 +1,19 @@
+/**
+* @file PeriodicTask.h
+* @brief Declarations of PeriodicTask class
+*/
+
 #ifndef REMOTE_TOP_PERIODICTASK_H
 #define REMOTE_TOP_PERIODICTASK_H
 
 #include <boost/asio.hpp>
 
-using Duration = std::chrono::high_resolution_clock::duration;
-using Callback = std::function<void()>;
+using Duration = std::chrono::high_resolution_clock::duration; /**< duration typedef */
+using Callback = std::function<void()>;                        /**< function prototype */
 
 /**
  * @struct PeriodicTask
- * @brief  simple wrapper that makes it easier to repeat action on fixed intervals
+ * @brief  Simple wrapper that makes it easier to repeat action on fixed intervals
  */
 struct PeriodicTask {
     /**

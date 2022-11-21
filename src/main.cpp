@@ -4,7 +4,6 @@
  */
 
 #include <sys/syslog.h>
-#include <iostream>
 #include "main.h"
 #include "server/AsyncServer.h"
 
@@ -13,8 +12,10 @@
 #include "git_rev.h"
 
 /**
- * @brief Starting point
- * @return status
+ * @brief Starting point, implementation used here was found on Internet,
+ * I guess that original version is here
+ * https://www.boost.org/doc/libs/1_73_0/doc/html/boost_asio/example/cpp11/fork/daemon.cpp
+ * @return non-zero if error
  */
 int main( int /*argc*/, char** /*argv*/ )
 {

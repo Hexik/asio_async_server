@@ -1,7 +1,11 @@
+/**
+* @file utilities.cpp
+* @brief Helper functions, /proc parsing implementation
+*/
+
 #include "utilities.h"
 #include <fstream>
 #include <sstream>
-#include <iostream>
 #include <iomanip>
 
 std::string Trim( const std::string& str )
@@ -28,6 +32,7 @@ std::string getCPU()
     if( ifs ) {
         std::string line;
 
+        // parse /proc/stat line by line
         while( std::getline( ifs, line ) ) {
             std::istringstream iss( line );
             std::string        item;
@@ -39,8 +44,8 @@ std::string getCPU()
                     // Calculation recipe from
                     // https://stackoverflow.com/questions/23367857/accurate-calculation-of-cpu-usage-given-in-percentage-in-linux/
                     const auto sumIdle  = idle + iowait;
-                    const auto NonIdle  = user + nice + system + irq + softirq + steal;
-                    const auto sumTotal = sumIdle + NonIdle;
+                    const auto nonIdle  = user + nice + system + irq + softirq + steal;
+                    const auto sumTotal = sumIdle + nonIdle;
 
                     //differentiate : actual value minus the previous one
                     const auto totald = sumTotal - prevTotal;
@@ -50,20 +55,22 @@ std::string getCPU()
                                                                 : 100.0f * ( static_cast<float>( totald - idled ) ) /
                                                                       static_cast<float>( totald );
 
+                    // save data for next calculation
                     prevTotal = sumTotal;
                     prevIdle  = sumIdle;
+
+                    // format result as %.2f
                     std::stringstream ss;
                     ss << std::fixed << std::setprecision( 2 ) << CPU_Percentage << " %";
                     return ss.str();
                 }
             } else {
                 std::cerr << "/proc/stat has wrong format: " << line << std::endl;
-                return "NaN";
+                break;
             }
         }
     }
     return "NaN";
-
 }
 
 std::string getMEM()
@@ -75,6 +82,7 @@ std::string getMEM()
         auto        counter = 0U;
         int64_t     result  = 0;
 
+        // parse /proc/meminfo line by line
         while( std::getline( ifs, line ) && counter < 4U ) {
             std::istringstream iss( line );
             std::string        item;
@@ -93,8 +101,8 @@ std::string getMEM()
                 return "NaN";
             }
         }
-        // if all 4 items found, result is returned else 0
-        return ( ( counter == 4U ) ? std::to_string( result ) : "0" ) + " KB";
+        // if all 4 items found, result is returned else ???
+        return ( ( counter == 4U ) ? std::to_string( result ) : "???" ) + " KB";
     } else {
         return "NaN";
     }

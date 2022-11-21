@@ -7,6 +7,7 @@
 #define REMOTE_TOP_CONSTANTS_H
 
 #include <cstdint>
+#include <iostream>
 
 constexpr uint16_t SERVER_PORT = 5001U; /**< Fixed server port */
 

@@ -1,3 +1,8 @@
+/**
+* @file AsyncServer.cpp
+* @brief Implementation of class encapsulating TCP server functionality
+*/
+
 #include "AsyncServer.h"
 #include "utilities.h"
 
@@ -30,16 +35,16 @@ void AsyncServer::session( boost::asio::ip::tcp::socket socket )
     do_read( s );
 }
 
-std::string AsyncServer::getResponse( const std::string& cmd )
+std::string AsyncServer::getResponse( const std::string& req )
 {
-    // response is calculated by periodical task, so inside task.period is response the same
-    if( cmd == "cpu" ) {
+    // response is pre-calculated by periodical task, so inside [task.period] is response the same
+    if( req == "cpu" ) {
         auto lock = std::unique_lock<std::mutex>( m_mutex );
         return m_CPU;
     }
 
     // response is calculated for every request
-    if( cmd == "mem" ) {
+    if( req == "mem" ) {
         return getMEM();
     }
 
@@ -67,7 +72,7 @@ void AsyncServer::do_read( const std::shared_ptr<session_state>& state )
     boost::asio::async_read_until( state->m_socket, state->m_streambuf, "\n",
                                    [state, this]( const boost::system::error_code& ec, std::size_t length ) {
                                        if( !ec ) {
-                                           assert( state->m_streambuf.size() >= length );
+                                           EXPECTS( state->m_streambuf.size() >= length );
 
                                            do_write( state, length );
                                        } else if( ec == boost::asio::error::eof ) {
@@ -82,22 +87,20 @@ void AsyncServer::do_read( const std::shared_ptr<session_state>& state )
 
 void AsyncServer::do_write( const std::shared_ptr<session_state>& state, std::size_t length )
 {
-    // extract command without \n
+    // extract command without all whitespaces
     const auto command =
-        Trim( std::string( boost::asio::buffer_cast<const char*>( state->m_streambuf.data() ), length - 1 ) );
-
-    if( m_verbose ) {
-        std::cerr << "Session read " << command << std::endl;
-    }
-
-    // prepare response
-    const auto response = command + "=" + getResponse( command ) + "\n";
-    if( m_verbose ) {
-        std::cerr << "Session write " << response;
-    }
+        Trim( std::string( boost::asio::buffer_cast<const char*>( state->m_streambuf.data() ), length ) );
 
     // remove used data from input stream
     state->m_streambuf.consume( length );
+
+    // prepare response
+    const auto response = command + "=" + getResponse( command ) + "\n";
+
+    if( m_verbose ) {
+        std::cerr << "Session read " << command << std::endl;
+        std::cerr << "Session write " << response;
+    }
 
     // send response and start new read
     boost::asio::async_write( state->m_socket, boost::asio::buffer( response ),
