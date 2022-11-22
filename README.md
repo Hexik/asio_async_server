@@ -45,7 +45,7 @@ cmake --build .
 The client and server binaries will be generated:
 
 - `./remote_top` daemon server
-- `./src/server/serverEcho` console server
+- `./src/server/serverEcho` server running in console, data dump
 - `./src/client/client` simple client
 
 
