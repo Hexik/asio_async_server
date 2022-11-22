@@ -6,7 +6,6 @@
 #include <boost/asio.hpp>
 #include "server/PeriodicTask.h"
 #include "utilities.h"
-#include <mutex>
 
 /**
  * @class AsyncServer
@@ -81,5 +80,4 @@ private:
     PeriodicTask                   m_task;     /**< periodic task */
     const bool                     m_verbose;  /**< verbosity level */
     std::string                    m_CPU;      /**< precalculated answer to 'cpu' command, made by PeriodicTask */
-    std::mutex                     m_mutex;    /**< lock shared data */
 };

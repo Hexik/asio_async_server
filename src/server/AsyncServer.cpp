@@ -12,10 +12,7 @@ AsyncServer::AsyncServer( boost::asio::io_context& context, uint16_t port, bool 
     m_CPU = getCPU(); // dirty hack: call this function to initialize prevXXX variables for the first time
 
     // start periodical CPU calculation
-    m_task.start( std::chrono::milliseconds( 500 ), [this]() {
-        auto lock = std::unique_lock<std::mutex>( m_mutex );
-        m_CPU     = getCPU();
-    } );
+    m_task.start( std::chrono::milliseconds( 500 ), [this]() { m_CPU = getCPU(); } );
 
     // ready for client(s)
     async_accept_one();
@@ -39,7 +36,6 @@ std::string AsyncServer::getResponse( const std::string& req )
 {
     // response is pre-calculated by periodical task, so inside [task.period] is response the same
     if( req == "cpu" ) {
-        auto lock = std::unique_lock<std::mutex>( m_mutex );
         return m_CPU;
     }
 
