@@ -5,6 +5,7 @@
 
 #include <boost/asio.hpp>
 #include "constants.h"
+#include <thread>
 
 /**
  * @brief Client - Starting point
