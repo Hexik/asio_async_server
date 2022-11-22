@@ -23,8 +23,6 @@ set(HEADER_DIR "")
 
 if (CMAKE_HOST_UNIX)
     message(STATUS "Unix host")
-elseif (CMAKE_HOST_WIN32)
-    message(STATUS "Windows host")
 else ()
     message(FATAL_ERROR "Unsupported OS/Platform")
 endif ()
@@ -44,13 +42,11 @@ endif ()
 ############################################################
 # Find packages - generic
 #-----------------------------------------------------------
-if (CMAKE_HOST_UNIX AND NOT WITH_DOC)
-    find_program(CCACHE_VAR ccache)
-    if (CCACHE_VAR)
-        SET_PROPERTY(GLOBAL PROPERTY RULE_LAUNCH_COMPILE ccache)
-        SET_PROPERTY(GLOBAL PROPERTY RULE_LAUNCH_LINK ccache)
-        message(STATUS "Using ccache")
-    endif ()
+find_program(CCACHE_VAR ccache)
+if (CCACHE_VAR)
+    SET_PROPERTY(GLOBAL PROPERTY RULE_LAUNCH_COMPILE ccache)
+    SET_PROPERTY(GLOBAL PROPERTY RULE_LAUNCH_LINK ccache)
+    message(STATUS "Using ccache")
 endif ()
 
 #-----------------------------------------------------------
@@ -76,12 +72,6 @@ SET(CMAKE_INCLUDE_CURRENT_DIR OFF)
 add_definitions(
         -D_GLIBCXX_USE_CXX11_ABI=0
 )
-
-if (WITH_DOC)
-    add_definitions(
-            -DCHECK_DOCS
-    )
-endif ()
 
 if (CMAKE_BUILD_TYPE MATCHES "Debug")
     add_definitions(

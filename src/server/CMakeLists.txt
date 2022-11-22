@@ -1,5 +1,6 @@
 set(src AsyncServer.cpp
-        utilities.cpp PeriodicTask.cpp PeriodicTask.h)
+        utilities.cpp
+        PeriodicTask.cpp)
 
 add_library(server STATIC ${src})
 
